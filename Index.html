@@ -1,1 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscripción Campamento</title>
 
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #0c1b12;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 30px;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transform: scale(1.08);
+      transition: opacity 1.5s ease, transform 8s ease;
+      z-index: 0;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(5, 18, 10, 0.45), rgba(5, 18, 10, 0.9)),
+        radial-gradient(circle at center, rgba(255,255,255,0.12), transparent 55%);
+      z-index: 1;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      max-width: 950px;
+      animation: fadeUp 1.2s ease forwards;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.35);
+      backdrop-filter: blur(10px);
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: clamp(2.7rem, 7vw, 6rem);
+      line-height: 1;
+      margin-bottom: 24px;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.55);
+    }
+
+    .dynamic-word {
+      color: #ffd369;
+    }
+
+    .subtitle {
+      font-size: clamp(1.05rem, 2.5vw, 1.45rem);
+      line-height: 1.6;
+      max-width: 790px;
+      margin: 0 auto 34px;
+      color: #f4f1e8;
+    }
+
+    .event-info {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+
+    .info-card {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.28);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 15px 22px;
+      min-width: 165px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+    }
+
+    .info-card strong {
+      display: block;
+      color: #ffd369;
+      font-size: 1.05rem;
+      margin-bottom: 5px;
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      padding: 18px 38px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffd369, #f47b20);
+      color: #241306;
+      font-weight: 900;
+      font-size: 1.05rem;
+      box-shadow: 0 18px 40px rgba(244, 123, 32, 0.45);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 24px 50px rgba(244, 123, 32, 0.65);
+    }
+
+    .btn:disabled {
+      opacity: 0.75;
+      cursor: wait;
+      transform: none;
+    }
+
+    .floating {
+      position: absolute;
+      z-index: 2;
+      font-size: 2rem;
+      opacity: 0.75;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .floating.one {
+      top: 15%;
+      left: 9%;
+    }
+
+    .floating.two {
+      top: 21%;
+      right: 10%;
+      animation-delay: 1s;
+    }
+
+    .floating.three {
+      bottom: 22%;
+      left: 12%;
+      animation-delay: 2s;
+    }
+
+    .cards {
+      position: relative;
+      z-index: 3;
+      max-width: 1120px;
+      margin: -115px auto 40px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .activity-card {
+      min-height: 245px;
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.38);
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .activity-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 28px 60px rgba(0,0,0,0.5);
+    }
+
+    .activity-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    }
+
+    .activity-card span {
+      position: absolute;
+      z-index: 2;
+      left: 22px;
+      bottom: 22px;
+      font-size: 1.4rem;
+      font-weight: 900;
+      text-shadow: 0 5px 18px rgba(0,0,0,0.6);
+    }
+
+    .eco-note {
+      max-width: 920px;
+      margin: 15px auto 60px;
+      padding: 28px;
+      text-align: center;
+      color: #e9f5e3;
+      font-size: 1.08rem;
+      line-height: 1.8;
+    }
+
+    .loader {
+      display: none;
+      margin: 20px auto 0;
+      width: 42px;
+      height: 42px;
+      border: 4px solid rgba(255,255,255,0.35);
+      border-top: 4px solid #ffd369;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    .loader.show {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(35px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-18px);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 850px) {
+      .hero {
+        padding: 24px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+        margin-top: -70px;
+      }
+
+      .activity-card {
+        min-height: 210px;
+      }
+
+      .floating {
+        display: none;
+      }
+
+      .info-card {
+        min-width: 145px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <section class="hero">
+
+    <!-- Imágenes dinámicas de fondo -->
+    <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1800&q=80');"></div>
+
+    <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1478827387698-1527781a4887?auto=format&fit=crop&w=1800&q=80');"></div>
+
+    <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=1800&q=80');"></div>
+
+    <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1517824806704-9040b037703b?auto=format&fit=crop&w=1800&q=80');"></div>
+
+    <div class="overlay"></div>
+
+    <div class="floating one">🏕️</div>
+    <div class="floating two">🔥</div>
+    <div class="floating three">🥾</div>
+
+    <div class="content">
+      <div class="badge">Campamento · Senderismo · Cocina de campo</div>
+
+      <h1>
+        Vive la aventura en la <span class="dynamic-word" id="word">naturaleza</span>
+      </h1>
+
+      <p class="subtitle">
+        Te damos la bienvenida a una experiencia diseñada para disfrutar senderos,
+        cocina de campo, convivencia al aire libre y noches de campamento, mientras
+        cuidamos y respetamos el medio ambiente.
+      </p>
+
+      <div class="event-info">
+        <div class="info-card">
+          <strong>Salida</strong>
+          10/07/2026
+        </div>
+
+        <div class="info-card">
+          <strong>Hora</strong>
+          8:00 a.m.
+        </div>
+
+        <div class="info-card">
+          <strong>Experiencia</strong>
+          Camping y senderos
+        </div>
+      </div>
+
+      <button class="btn" id="goForm">
+        Iniciar inscripción
+      </button>
+
+      <div class="loader" id="loader"></div>
+    </div>
+  </section>
+
+  <section class="cards">
+    <div class="activity-card" style="background-image: url('https://images.unsplash.com/photo-1508873699372-7aeab60b44ab?auto=format&fit=crop&w=1000&q=80');">
+      <span>Camping</span>
+    </div>
+
+    <div class="activity-card" style="background-image: url('https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1000&q=80');">
+      <span>Cocina de campo</span>
+    </div>
+
+    <div class="activity-card" style="background-image: url('https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1000&q=80');">
+      <span>Senderos</span>
+    </div>
+  </section>
+
+  <section class="eco-note">
+    🌿 Durante esta experiencia disfrutaremos la naturaleza con responsabilidad:
+    respetaremos los senderos, reduciremos residuos, cuidaremos el entorno y
+    promoveremos una convivencia segura para todas y todos.
+  </section>
+
+  <script>
+    const FORM_URL = "https://script.google.com/macros/s/AKfycbxksAVFiSUTv8kHvXSw_ufUTAmLroy3EIEkGLlxYiIPXDqkb82JHj9MQ7ZGjF8cgAO1AQ/exec";
+
+    const slides = document.querySelectorAll(".slide");
+    let currentSlide = 0;
+
+    setInterval(() => {
+      slides[currentSlide].classList.remove("active");
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add("active");
+    }, 4500);
+
+    const words = [
+      "naturaleza",
+      "montaña",
+      "aventura",
+      "ruta",
+      "fogata",
+      "experiencia"
+    ];
+
+    const wordElement = document.getElementById("word");
+    let wordIndex = 0;
+
+    setInterval(() => {
+      wordIndex = (wordIndex + 1) % words.length;
+      wordElement.textContent = words[wordIndex];
+    }, 1800);
+
+    const button = document.getElementById("goForm");
+    const loader = document.getElementById("loader");
+
+    button.addEventListener("click", function () {
+      button.disabled = true;
+      button.textContent = "Cargando formulario...";
+      loader.classList.add("show");
+
+      setTimeout(() => {
+        window.location.href = FORM_URL;
+      }, 900);
+    });
+  </script>
+
+</body>
+</html>
